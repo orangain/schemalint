@@ -31,7 +31,13 @@ describe("mandatoryColumns", () => {
         tables: [
           {
             name: "test",
-            columns: [{ name: "id", expandedType: "pg_catalog.int4" }],
+            columns: [
+              {
+                name: "id",
+                expandedType: "pg_catalog.int4",
+                ordinalPosition: 1,
+              },
+            ],
           },
         ],
       };
@@ -68,7 +74,7 @@ describe("mandatoryColumns", () => {
         expect.objectContaining({
           rule: "mandatory-columns",
           identifier: `schema.test`,
-          message: `Column "id" of type "pg_catalog.int4" is missing`,
+          message: `Mandatory column "id" is missing`,
         }),
       );
     });
@@ -80,7 +86,13 @@ describe("mandatoryColumns", () => {
         tables: [
           {
             name: "test",
-            columns: [{ name: "id", expandedType: "pg_catalog.int2" }],
+            columns: [
+              {
+                name: "id",
+                expandedType: "pg_catalog.int2",
+                ordinalPosition: 1,
+              },
+            ],
           },
         ],
       };
@@ -96,7 +108,41 @@ describe("mandatoryColumns", () => {
         expect.objectContaining({
           rule: "mandatory-columns",
           identifier: `schema.test.id`,
-          message: `Column "id" is of type "pg_catalog.int2" but expected "pg_catalog.int4"`,
+          message: `Column "id" has properties {"expandedType":"pg_catalog.int2"} but expected {"expandedType":"pg_catalog.int4"}`,
+        }),
+      );
+    });
+
+    it("should report when mandatory column exists but ordinalPosition differs", () => {
+      const mockReporter = vi.fn();
+      const schemaObject: DeepPartial<Schema> = {
+        name: "schema",
+        tables: [
+          {
+            name: "test",
+            columns: [
+              {
+                name: "id",
+                expandedType: "pg_catalog.int2",
+                ordinalPosition: 1,
+              },
+            ],
+          },
+        ],
+      };
+
+      mandatoryColumns.process({
+        options: [[{ name: "id", ordinalPosition: 2 }]],
+        schemaObject: schemaObject as Schema,
+        report: mockReporter,
+      });
+
+      expect(mockReporter).toBeCalledTimes(1);
+      expect(mockReporter).toBeCalledWith(
+        expect.objectContaining({
+          rule: "mandatory-columns",
+          identifier: `schema.test.id`,
+          message: `Column "id" has properties {"ordinalPosition":1} but expected {"ordinalPosition":2}`,
         }),
       );
     });
@@ -111,8 +157,16 @@ describe("mandatoryColumns", () => {
           {
             name: "test",
             columns: [
-              { name: "id", expandedType: "pg_catalog.int4" },
-              { name: "created_at", expandedType: "pg_catalog.timestamptz" },
+              {
+                name: "id",
+                expandedType: "pg_catalog.int4",
+                ordinalPosition: 1,
+              },
+              {
+                name: "created_at",
+                expandedType: "pg_catalog.timestamptz",
+                ordinalPosition: 2,
+              },
             ],
           },
         ],
@@ -139,7 +193,13 @@ describe("mandatoryColumns", () => {
         tables: [
           {
             name: "test",
-            columns: [{ name: "id", expandedType: "pg_catalog.int4" }],
+            columns: [
+              {
+                name: "id",
+                expandedType: "pg_catalog.int4",
+                ordinalPosition: 1,
+              },
+            ],
           },
         ],
       };
@@ -160,7 +220,7 @@ describe("mandatoryColumns", () => {
         expect.objectContaining({
           rule: "mandatory-columns",
           identifier: `schema.test`,
-          message: `Column "created_at" of type "pg_catalog.timestamptz" is missing`,
+          message: `Mandatory column "created_at" is missing`,
         }),
       );
     });
@@ -193,14 +253,14 @@ describe("mandatoryColumns", () => {
         expect.objectContaining({
           rule: "mandatory-columns",
           identifier: `schema.test`,
-          message: `Column "id" of type "pg_catalog.int4" is missing`,
+          message: `Mandatory column "id" is missing`,
         }),
       );
       expect(mockReporter).toBeCalledWith(
         expect.objectContaining({
           rule: "mandatory-columns",
           identifier: `schema.test`,
-          message: `Column "created_at" of type "pg_catalog.timestamptz" is missing`,
+          message: `Mandatory column "created_at" is missing`,
         }),
       );
     });

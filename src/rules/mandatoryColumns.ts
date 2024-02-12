@@ -1,12 +1,11 @@
-import { TableDetails } from "extract-pg-schema";
+import { TableColumn, TableDetails } from "extract-pg-schema";
 import * as R from "ramda";
 
 import Rule from "../Rule";
 
 type ExpectedColumn = {
   name: string;
-  expandedType: string;
-};
+} & Partial<TableColumn>;
 
 export const mandatoryColumns: Rule = {
   name: "mandatory-columns",
@@ -17,20 +16,26 @@ export const mandatoryColumns: Rule = {
     const expectedColumns = option ?? [];
     const validator = ({ name: tableName, columns }: TableDetails) => {
       const columnsByName = R.indexBy(R.prop("name"), columns);
-      expectedColumns.forEach((expectedColumn: ExpectedColumn) => {
-        const column = columnsByName[expectedColumn.name];
+      expectedColumns.forEach(({ name, ...expectedProps }: ExpectedColumn) => {
+        const column = columnsByName[name];
         if (!column) {
           report({
             rule: this.name,
             identifier: `${schemaObject.name}.${tableName}`,
-            message: `Column "${expectedColumn.name}" of type "${expectedColumn.expandedType}" is missing`,
+            message: `Mandatory column "${name}" is missing`,
           });
-        } else if (column.expandedType !== expectedColumn.expandedType) {
-          report({
-            rule: this.name,
-            identifier: `${schemaObject.name}.${tableName}.${column.name}`,
-            message: `Column "${column.name}" is of type "${column.expandedType}" but expected "${expectedColumn.expandedType}"`,
-          });
+        } else {
+          const { name: _, ...partialColumnProps } = R.pick(
+            Object.keys(expectedProps) as (keyof TableColumn)[],
+            column,
+          );
+          if (!R.equals(partialColumnProps, expectedProps)) {
+            report({
+              rule: this.name,
+              identifier: `${schemaObject.name}.${tableName}.${column.name}`,
+              message: `Column "${column.name}" has properties ${JSON.stringify(partialColumnProps)} but expected ${JSON.stringify(expectedProps)}`,
+            });
+          }
         }
       });
     };
