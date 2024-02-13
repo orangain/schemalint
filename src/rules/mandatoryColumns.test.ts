@@ -43,7 +43,7 @@ describe("mandatoryColumns", () => {
       };
 
       mandatoryColumns.process({
-        options: [[{ name: "id", expandedType: "pg_catalog.int4" }]],
+        options: [{ id: { expandedType: "pg_catalog.int4" } }],
         schemaObject: schemaObject as Schema,
         report: mockReporter,
       });
@@ -64,7 +64,7 @@ describe("mandatoryColumns", () => {
       };
 
       mandatoryColumns.process({
-        options: [[{ name: "id", expandedType: "pg_catalog.int4" }]],
+        options: [{ id: { expandedType: "pg_catalog.int4" } }],
         schemaObject: schemaObject as Schema,
         report: mockReporter,
       });
@@ -98,7 +98,7 @@ describe("mandatoryColumns", () => {
       };
 
       mandatoryColumns.process({
-        options: [[{ name: "id", expandedType: "pg_catalog.int4" }]],
+        options: [{ id: { expandedType: "pg_catalog.int4" } }],
         schemaObject: schemaObject as Schema,
         report: mockReporter,
       });
@@ -132,7 +132,7 @@ describe("mandatoryColumns", () => {
       };
 
       mandatoryColumns.process({
-        options: [[{ name: "id", ordinalPosition: 2 }]],
+        options: [{ id: { ordinalPosition: 2 } }],
         schemaObject: schemaObject as Schema,
         report: mockReporter,
       });
@@ -174,10 +174,10 @@ describe("mandatoryColumns", () => {
 
       mandatoryColumns.process({
         options: [
-          [
-            { name: "id", expandedType: "pg_catalog.int4" },
-            { name: "created_at", expandedType: "pg_catalog.timestamptz" },
-          ],
+          {
+            id: { expandedType: "pg_catalog.int4" },
+            created_at: { expandedType: "pg_catalog.timestamptz" },
+          },
         ],
         schemaObject: schemaObject as Schema,
         report: mockReporter,
@@ -206,10 +206,10 @@ describe("mandatoryColumns", () => {
 
       mandatoryColumns.process({
         options: [
-          [
-            { name: "id", expandedType: "pg_catalog.int4" },
-            { name: "created_at", expandedType: "pg_catalog.timestamptz" },
-          ],
+          {
+            id: { expandedType: "pg_catalog.int4" },
+            created_at: { expandedType: "pg_catalog.timestamptz" },
+          },
         ],
         schemaObject: schemaObject as Schema,
         report: mockReporter,
@@ -239,10 +239,10 @@ describe("mandatoryColumns", () => {
 
       mandatoryColumns.process({
         options: [
-          [
-            { name: "id", expandedType: "pg_catalog.int4" },
-            { name: "created_at", expandedType: "pg_catalog.timestamptz" },
-          ],
+          {
+            id: { expandedType: "pg_catalog.int4" },
+            created_at: { expandedType: "pg_catalog.timestamptz" },
+          },
         ],
         schemaObject: schemaObject as Schema,
         report: mockReporter,

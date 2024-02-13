@@ -3,9 +3,7 @@ import * as R from "ramda";
 
 import Rule from "../Rule";
 
-type ExpectedColumn = {
-  name: string;
-} & Partial<TableColumn>;
+type ExpectedColumn = Partial<Omit<TableColumn, "name">>;
 
 export const mandatoryColumns: Rule = {
   name: "mandatory-columns",
@@ -13,10 +11,10 @@ export const mandatoryColumns: Rule = {
     description: "Require tables to have specific columns",
   },
   process({ options: [option], schemaObject, report }) {
-    const expectedColumns = option ?? [];
+    const expectedColumns: Record<string, ExpectedColumn> = option ?? {};
     const validator = ({ name: tableName, columns }: TableDetails) => {
       const columnsByName = R.indexBy(R.prop("name"), columns);
-      expectedColumns.forEach(({ name, ...expectedProps }: ExpectedColumn) => {
+      Object.entries(expectedColumns).forEach(([name, expectedProps]) => {
         const column = columnsByName[name];
         if (!column) {
           report({
